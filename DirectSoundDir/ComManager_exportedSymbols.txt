@@ -1,0 +1,3 @@
+_D14DirectSoundDir10ComManager10ComManager9initilizeFZv
+_D14DirectSoundDir10ComManager10ComManager11uninitilizeFZv
+_D14DirectSoundDir10ComManager10RefCounterk

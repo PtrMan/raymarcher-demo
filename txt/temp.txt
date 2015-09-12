@@ -1,0 +1,114 @@
+DEVICEFN float calculateShDegree3Accelerated(float y, float phi, int shCoefficientOffsetNotUsed, ComplexFloat *shCoefficientsLocalForInstance)
+{
+	float y2 = y*y;
+	float y3 = y2*y;
+	float 1my2 = 1.0f - y2;
+	float y2m1 = y2 - 1.0f;
+
+	float sinPhiM0 = 1.0f;
+	float sinPhiM1 = sqrt(1my2);
+	float sinPhiM2 = 1my2;
+
+	float sinPhiMm1 = 1.0f/sinPhiM1;
+	float sinPhiMm2 = sinPhiMm1*sinPhiMm1;
+	float sinPhiMm3 = sinPhiMm2*sinPhiMm1;
+	
+
+	// this is the combined drivation of the x^2 - 1 term in the complex legendre polynominal
+	// with the factor in the legendre Polynominal and the term with the faculty in the legendre polynominal
+	// this got also multiplied by the external factor
+	
+	float combined_0_m0 = 0.282095f;
+
+	float combined_1_mp1 = -0.345494f;
+	float combined_1_m0 = 0.488603f*y;
+	float combined_1_mm1 = -0.345494f*y2m1;
+
+	float combined_2_mp2 = 0.386274f;
+	float combined_2_mp1 = -0.772548f*y;
+	float combined_2_m0 = 0.0788479f*(8.0f*y2 + 4.0f*y2m1);
+	float combined_2_mm1 = combined_2_mp1*y2m1;
+	float combined_2_mm2 = 0.386274f*y2m1*y2m1;
+
+	float combined_3_mp3 = -0.417224f;
+	float combined_3_mp2 = 1.02199f*y;
+	float combined_3_mp1 = -0.00448861f*(288.0f*y2 + 72.0f*y2m1);
+	float combined_3_m0 = 0.015549f*(48.0f*y3 + 72.0f*y*y2m1);
+	float combined_3_mm1 = -0.00448861f*(288.0f*y2 + 72.0f*y2m1);
+	float combined_3_mm2 = combined_3_mp2*y2m1*y2m1;
+	float combined_3_mm3 = -0.417224f*y2m1*y2m1*y2m1;
+
+	// TODO< more terms >
+
+	// multiply the values with the cos term of the complex legendre polynominal
+
+	float scale_0_0 = combined_0_m0;
+
+	float scale_1_m1 = combined_1_mm1 * sinPhiMm1;
+	float scale_1_0 = combined_1_m0;
+	float scale_1_p1 = combined_1_mp1 * sinPhiM1;
+
+	float scale_2_m2 = combined_2_mm2 * sinPhiMm2;
+	float scale_2_m1 = combined_2_mm1 * sinPhiMm1;
+	float scale_2_0 = combined_2_m0;
+	float scale_2_p1 = combined_2_mp1 * sinphiM1;
+	float scale_2_p2 = combined_2_mp2 * sinphiM2;
+
+	float scale_3_m3 = combined_3_mm3 * sinphiMm3;
+	float scale_3_m2 = combined_3_mm2 * sinphiMm2;
+	float scale_3_m1 = combined_3_mm1 * sinphiMm1;
+	float scale_3_0 = combined_3_m0;
+	float scale_3_p1 = combined_3_mp1 * sinPhiM1;
+	float scale_3_p2 = combined_3_mp2 * sinPhiM2;
+	float scale_3_p3 = combined_3_mp3 * sinPhiM3;
+
+
+
+
+
+	// TODO< the other funny stuff >
+
+	// using the sinus/cosinus identities we can save A LOT of sin/cos calls
+	float sinPhi = fastSin(phi);
+	float cosPhi = fastCos(phi);
+
+	float sinPhi2 = 2.0f*sinPhi*cosPhi;
+	float cosPhi2 = 2.0f*cosPhi*cosPhi-1.0f;
+
+	float sinPhi3 = 3.0f*sinPhi - 4.0f*sinPhi*sinPhi*sinPhi;
+	float cosPhi3 = 4.0f*cosPhi*cosPhi*cosPhi - 3.0f*cosPhi;
+
+	ComplexFloat cexpm1 = CREATECOMPLEXFLOAT(cosPhi, -sinPhi);
+	ComplexFloat cexpp1 = CREATECOMPLEXFLOAT(cosPhi, sinPhi);
+	ComplexFloat cexpm2 = CREATECOMPLEXFLOAT(cosPhi2, -sinPhi2);
+	ComplexFloat cexpp2 = CREATECOMPLEXFLOAT(cosPhi2, sinPhi2);
+	ComplexFloat cexpm3 = CREATECOMPLEXFLOAT(cosPhi3, -sinPhi3);
+	ComplexFloat cexpp3 = CREATECOMPLEXFLOAT(cosPhi3, sinPhi3);
+	
+	float result;
+
+	result = scale_0_0 * shCoefficientsLocalForInstance[0].x; // special
+
+	result += cmul(cscale(cexpm1, scale_1_m1), shCoefficientsLocalForInstance[1]).x;
+	result += scale_1_0*shCoefficientsLocalForInstance[2].x; // special
+	result += cmul(cscale(cexpp1, scale_1_p1), shCoefficientsLocalForInstance[3]).x;
+
+	
+	result += cmul(cscale(cexpm2, scale_2_m2), shCoefficientsLocalForInstance[4]).x;
+	result += cmul(cscale(cexpm1, scale_2_m1), shCoefficientsLocalForInstance[5]).x;
+	result += scale_2_0*shCoefficientsLocalForInstance[6].x; // special
+	result += cmul(cscale(cexpp1, scale_2_p1), shCoefficientsLocalForInstance[7]).x;
+	result += cmul(cscale(cexpp2, scale_2_p2), shCoefficientsLocalForInstance[8]).x;
+	
+	
+	result += cmul(cscale(cexpm3, scale_3_m3), shCoefficientsLocalForInstance[9]).x;
+	result += cmul(cscale(cexpm2, scale_3_m2), shCoefficientsLocalForInstance[10]).x;
+	result += cmul(cscale(cexpm1, scale_3_m1), shCoefficientsLocalForInstance[11]).x;
+	result += scale_3_0*shCoefficientsLocalForInstance[12].x; // special
+	result += cmul(cscale(cexpp1, scale_3_p1), shCoefficientsLocalForInstance[13]).x;
+	result += cmul(cscale(cexpp2, scale_3_p2), shCoefficientsLocalForInstance[14]).x;
+	result += cmul(cscale(cexpp3, scale_3_p3), shCoefficientsLocalForInstance[15]).x;
+
+	return result;
+}
+

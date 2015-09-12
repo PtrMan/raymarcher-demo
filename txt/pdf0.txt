@@ -1,0 +1,2 @@
+http://hyperfun.org/FHF_Log/Bastos_GPU_ADF_SMI08.pdf
+	GPU-Accelerated Adaptively Sampled Distance Fields
