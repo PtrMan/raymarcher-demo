@@ -1,0 +1,17 @@
+local kernel = event:getKernel("core")
+
+local Buffer = Camera.framebuffer:getBuffer(0)
+
+
+LightPos = { 0.0, 
+		0.0, 
+		0.0, 
+		0.0 }
+
+cl.clEnqueueAcquireGLObjects(Buffer)
+
+cl.clSetKernelArg(kernel, 0, Buffer)
+cl.clSetKernelArg(kernel, 1, cl.cl_float4, LightPos)
+cl.clEnqueueNDRangeKernel(kernel, 2, {512, 512}, {16, 8})
+
+cl.clEnqueueReleaseGLObjects(Buffer)

@@ -1,0 +1,99 @@
+OPTLINK : Warning 23: No Stack 
+OpenClComputeStatic.obj(OpenClComputeStatic) 
+ Error 42: Symbol Undefined _clCreateProgramWithSource@20
+OpenClComputeStatic.obj(OpenClComputeStatic) 
+ Error 42: Symbol Undefined _D11SimpleArray21__T11SimpleArrayTAyaZ11SimpleArray7opIndexMFNaNbkZAya
+OpenClComputeStatic.obj(OpenClComputeStatic) 
+ Error 42: Symbol Undefined _clReleaseProgram@4
+OpenClComputeStatic.obj(OpenClComputeStatic) 
+ Error 42: Symbol Undefined _clBuildProgram@24
+OpenClComputeStatic.obj(OpenClComputeStatic) 
+ Error 42: Symbol Undefined _puts
+OpenClComputeStatic.obj(OpenClComputeStatic) 
+ Error 42: Symbol Undefined _malloc
+OpenClComputeStatic.obj(OpenClComputeStatic) 
+ Error 42: Symbol Undefined __d_local_unwind2
+OpenClComputeStatic.obj(OpenClComputeStatic) 
+ Error 42: Symbol Undefined _D11SimpleArray19__T11SimpleArrayTiZ11SimpleArray7opIndexMFNaNbkZi
+OpenClComputeStatic.obj(OpenClComputeStatic) 
+ Error 42: Symbol Undefined _clGetProgramBuildInfo@24
+ScopeGuardMemory.obj(ScopeGuardMemory) 
+ Error 42: Symbol Undefined _free
+App.obj(App) 
+ Error 42: Symbol Undefined _D3std5array17__T8AppenderTAxaZÄâé4Data11__xopEqualsFKxSÄ´ºÄÆÆZb
+App.obj(App) 
+ Error 42: Symbol Undefined _D3std8internal14unicode_tables25__T9TrieEntryTbVi8—5ÍZÄäñ11__xopEqualsFNfKxSÄ¬’Ä≈≈Zb
+App.obj(App) 
+ Error 42: Symbol Undefined _D3std8internal14unicode_tables28__T9TrieEntryTbVi7—4“—6ZÄäô11__xopEqualsFNfKxSÄ≈ÿÄ»»Zb
+App.obj(App) 
+ Error 42: Symbol Undefined _D3std6traits15__T8DemangleTkZÄâå11__xopEqualsFKxSÄ•∂Ä®®Zb
+App.obj(App) 
+ Error 42: Symbol Undefined _D3std3uni25__T16SliceOverIndexedTAiZÄíñ11__xopEqualsFKxSÄµ∆Ä∏∏Zb
+App.obj(App) 
+ Error 42: Symbol Undefined _D3std6format18__T10FormatSpecTaZ10FormatSpec8toStringMFNaNfZAya
+App.obj(App) 
+ Error 42: Symbol Undefined _D3std8internal14unicode_tables25__T9TrieEntryTbVi8—4—9ZÄäñ11__xopEqualsFNfKxSÄ¬’Ä≈≈Zb
+App.obj(App) 
+ Error 42: Symbol Undefined _D15TypeInfo_Struct6__vtblZ
+App.obj(App) 
+ Error 42: Symbol Undefined _D3std8internal14unicode_tables25__T9TrieEntryTtVi8—7—6ZÄäñ11__xopEqualsFNfKxSÄ¬’Ä≈≈Zb
+App.obj(App) 
+ Error 42: Symbol Undefined _D3std8internal14unicode_tables25__T9TrieEntryTbVi8—6—7ZÄäñ11__xopEqualsFNfKxSÄ¬’Ä≈≈Zb
+App.obj(App) 
+ Error 42: Symbol Undefined _D3std6format18__T10FÄÖçSpecTaZÄåè11__xopEqualsFKxSÄ´ºÄÆÆZb
+App.obj(App) 
+ Error 42: Symbol Undefined _D3std5array17__T8AppenderTAyaZÄâé4Data11__xopEqualsFKxSÄ´ºÄÆÆZb
+
+ Start  Stop   Length Name                   Class
+ 00000H 005E3H 005E4H _TEXT                  CODE 32-bit
+ 005F0H 00F9FH 009B0H _DATA                  DATA 32-bit
+ 00FA0H 00FA0H 00000H FMB                    DATA 32-bit
+ 00FA0H 00FB3H 00014H FM                     DATA 32-bit
+ 00FB4H 00FB4H 00000H FME                    DATA 32-bit
+ 00FC0H 00FC0H 00000H CONST                  CONST 32-bit
+ 00FC0H 00FFFH 00040H _BSS                   BSS 32-bit
+ 01000H 01000H 00000H .tls                   tls 32-bit
+ 01000H 01003H 00004H .tls$                  tls 32-bit
+ 01010H 01010H 00000H .tls$ZZZ               tls 32-bit
+
+ Origin   Group
+ FFFF:F   FLAT
+
+  Address         Publics by Name
+
+ 005F:0640       _D11miniRuntime12__ModuleInfoZ
+ 005F:0620       _D16ScopeGuardMemory12__ModuleInfoZ
+ 0000:05C0       _D16ScopeGuardMemory16ScopeGuardMemory6__ctorMFNbNcPvZS16ScopeGuardMemory16ScopeGuardMemory
+ 0000:05D0       _D16ScopeGuardMemory16ScopeGuardMemory6__dtorMFNbZv
+ 00FC:0030       _D16ScopeGuardMemory16ScopeGuardMemory6__initZ
+ 005F:05D0       _D19OpenClComputeStatic12__ModuleInfoZ
+ 0000:056C       _D19OpenClComputeStatic19OpenClComputeStatic14releaseProgramFNbiZv
+ 0000:0578       _D19OpenClComputeStatic19OpenClComputeStatic18openCLHandleResultFNbE6opencl1c2cl10cl_errcodeJbJAyaZv
+ 0000:0020       _D19OpenClComputeStatic19OpenClComputeStatic23buildAndLinkWithSourcesFiS11SimpleArray19__T11Simp2E7FD5F178785B0992D2545B7192A1C3
+ 00FC:0020       _D19OpenClComputeStatic19OpenClComputeStatic6__initZ
+ 005F:00B0       _D36ComputeImplementationErrorDescriptor12__ModuleInfoZ
+ 00FC:0000       _D36ComputeImplementationErrorDescriptor36ComputeImplementationErrorDescriptor6__initZ
+ 0000:0000       _D36ComputeIÈlementationErrorDescriptorÄ¶¶22setToUnknowÄÜùSÄÉ©eFKSÄÃÁZv
+ 005F:09A4       _D3App12__ModuleInfoZ
+ 0000:05E0       __d_framehandler
+ 0100:0000       __except_list
+
+  Address         Publics by Value
+
+ 0000:0000       _D36ComputeIÈlementationErrorDescriptorÄ¶¶22setToUnknowÄÜùSÄÉ©eFKSÄÃÁZv
+ 0000:0020       _D19OpenClComputeStatic19OpenClComputeStatic23buildAndLinkWithSourcesFiS11SimpleArray19__T11Simp2E7FD5F178785B0992D2545B7192A1C3
+ 0000:056C       _D19OpenClComputeStatic19OpenClComputeStatic14releaseProgramFNbiZv
+ 0000:0578       _D19OpenClComputeStatic19OpenClComputeStatic18openCLHandleResultFNbE6opencl1c2cl10cl_errcodeJbJAyaZv
+ 0000:05C0       _D16ScopeGuardMemory16ScopeGuardMemory6__ctorMFNbNcPvZS16ScopeGuardMemory16ScopeGuardMemory
+ 0000:05D0       _D16ScopeGuardMemory16ScopeGuardMemory6__dtorMFNbZv
+ 0000:05E0       __d_framehandler
+ 005F:00B0       _D36ComputeImplementationErrorDescriptor12__ModuleInfoZ
+ 005F:05D0       _D19OpenClComputeStatic12__ModuleInfoZ
+ 005F:0620       _D16ScopeGuardMemory12__ModuleInfoZ
+ 005F:0640       _D11miniRuntime12__ModuleInfoZ
+ 005F:09A4       _D3App12__ModuleInfoZ
+ 00FC:0000       _D36ComputeImplementationErrorDescriptor36ComputeImplementationErrorDescriptor6__initZ
+ 00FC:0020       _D19OpenClComputeStatic19OpenClComputeStatic6__initZ
+ 00FC:0030       _D16ScopeGuardMemory16ScopeGuardMemory6__initZ
+ 0100:0000       __except_list
+OPTLINK : Warning 134: No Start Address 

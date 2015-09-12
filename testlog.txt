@@ -1,0 +1,106 @@
+
+Input file: DirectSound/dsound.obj, output file: DirectSound/dsound.asm
+Converting from OMF32 to Disassembly32
+Checksums are zero
+
+  0 Debug sections removed
+  0 Exception sections removed
+ENTRYSYMBOLS
+['_D11DirectSound6dsound16IID_IDirectSoundxS3std1c7windows3com4GUID', '_D11DirectSound6dsound17CLSID_DirectSoundxS3std1c7windows3com4GUID']
+[VERBOSE-DEBUG] ->_D3std5array17__T8AppenderTAyaZ8Appender4Data6__initZ<-
+[VERBOSE-DEBUG] ->_D3std5array17__T8AppenderTAxaZ8Appender6__initZ<-
+[VERBOSE-DEBUG] ->_D3std3uni25__T16SliceOverIndexedTAiZ16SliceOverIndexed6__initZ<-
+[VERBOSE-DEBUG] ->_D3std8internal14unicode_tables25__T9TrieEntryTbVi8Vi6Vi7Z9TrieEntry6__initZ<-
+[VERBOSE-DEBUG] ->_D48TypeInfo_S3std5array17__T8AppenderTAyaZ8Appender6__initZ<-
+[VERBOSE-DEBUG] ->_D3std8internal14unicode_tables28__T9TrieEntryTbVi7Vi4Vi4Vi6Z9TrieEntry6__initZ<-
+[VERBOSE-DEBUG] ->_D3std8internal14unicode_tables25__T9TrieEntryTbVi8Vi4Vi9Z9TrieEntry6__initZ<-
+[VERBOSE-DEBUG] ->_D63TypeInfo_S3std3uni25__T16SliceOverIndexedTAiZ16SliceOverIndexed6__initZ<-
+[VERBOSE-DEBUG] ->_D38TypeInfo_S11DirectSound6dsound7DSBCAPS6__initZ<-
+[VERBOSE-DEBUG] ->_D76TypeInfo_S3std8internal14unicode_tables25__T9TrieEntryTbVi8Vi4Vi9Z9TrieEntry6__initZ<-
+[VERBOSE-DEBUG] ->_D3std6traits15__T8DemangleTkZ8Demangle6__initZ<-
+[VERBOSE-DEBUG] ->_D47TypeInfo_S3std6traits15__T8DemangleTkZ8Demangle6__initZ<-
+[VERBOSE-DEBUG] ->_D3std5array17__T8AppenderTAxaZ8Appender4Data6__initZ<-
+[VERBOSE-DEBUG] ->_D3std8internal14unicode_tables25__T9TrieEntryTtVi8Vi7Vi6Z9TrieEntry6__initZ<-
+[VERBOSE-DEBUG] ->_D53TypeInfo_S3std5array17__T8AppenderTAxaZ8Appender4Data6__initZ<-
+[VERBOSE-DEBUG] ->_D3std8internal14unicode_tables25__T9TrieEntryTbVi8Vi5Vi8Z9TrieEntry6__initZ<-
+[VERBOSE-DEBUG] ->_D76TypeInfo_S3std8internal14unicode_tables25__T9TrieEntryTbVi8Vi5Vi8Z9TrieEntry6__initZ<-
+[VERBOSE-DEBUG] ->_D50TypeInfo_C11DirectSound6dsound18IDirectSoundBuffer6__initZ<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound12WAVEFORMATEX6__initZ<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound7DSBCAPS6__initZ<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound12DSBUFFERDESC6__initZ<-
+[VERBOSE-DEBUG] ->_D44TypeInfo_C11DirectSound6dsound12IDirectSound6__initZ<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound14MAKE_DSHRESULTFkZi<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound17CLSID_DirectSoundxS3std1c7windows3com4GUID<-
+[VERBOSE-DEBUG] ->?_020<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound15DSBCAPS_CTRLPANxk<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound21DSBCAPS_PRIMARYBUFFERxk<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound6_FACDSxk<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound15DSBPLAY_LOOPINGxk<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound16DSERR_BUFFERLOSTxk<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound17DSERR_INVALIDCALLxk<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound12__ModuleInfoZ<-
+[VERBOSE-DEBUG] ->?_003<-
+[VERBOSE-DEBUG] ->?_002<-
+[VERBOSE-DEBUG] ->?_001<-
+[VERBOSE-DEBUG] ->?_007<-
+[VERBOSE-DEBUG] ->?_006<-
+[VERBOSE-DEBUG] ->?_005<-
+[VERBOSE-DEBUG] ->?_004<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound12IDirectSound11__InterfaceZ<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound19DSBCAPS_GLOBALFOCUSxk<-
+[VERBOSE-DEBUG] ->?_008<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound18DSERR_INVALIDPARAMxk<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound21DSERR_PRIOLEVELNEEDEDxk<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound15WAVE_FORMAT_PCMxk<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound21DSBCAPS_CTRLFREQUENCYxk<-
+[VERBOSE-DEBUG] ->?_021<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound16IID_IDirectSoundxS3std1c7windows3com4GUID<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound12DSSCL_NORMALxk<-
+[VERBOSE-DEBUG] ->?_018<-
+[VERBOSE-DEBUG] ->?_019<-
+[VERBOSE-DEBUG] ->?_014<-
+[VERBOSE-DEBUG] ->?_015<-
+[VERBOSE-DEBUG] ->?_016<-
+[VERBOSE-DEBUG] ->?_017<-
+[VERBOSE-DEBUG] ->?_010<-
+[VERBOSE-DEBUG] ->?_011<-
+[VERBOSE-DEBUG] ->?_012<-
+[VERBOSE-DEBUG] ->?_013<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound18DSBCAPS_CTRLVOLUMExk<-
+[VERBOSE-DEBUG] ->?_009<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound18IDirectSoundBuffer11__InterfaceZ<-
+[VERBOSE-DEBUG] ->_D44TypeInfo_S11DirectSound6dsound12WAVEFORMATEX6__initZ<-
+[VERBOSE-DEBUG] ->_D53TypeInfo_S3std5array17__T8AppenderTAyaZ8Appender4Data6__initZ<-
+[VERBOSE-DEBUG] ->_D48TypeInfo_S3std5array17__T8AppenderTAxaZ8Appender6__initZ<-
+[VERBOSE-DEBUG] ->_D53TypeInfo_S3std6format18__T10FormatSpecTaZ10FormatSpec6__initZ<-
+[VERBOSE-DEBUG] ->_D3std5array17__T8AppenderTAyaZ8Appender6__initZ<-
+[VERBOSE-DEBUG] ->_D76TypeInfo_S3std8internal14unicode_tables25__T9TrieEntryTtVi8Vi7Vi6Z9TrieEntry6__initZ<-
+[VERBOSE-DEBUG] ->_D79TypeInfo_S3std8internal14unicode_tables28__T9TrieEntryTbVi7Vi4Vi4Vi6Z9TrieEntry6__initZ<-
+[VERBOSE-DEBUG] ->_D3std3uni20__T9sliceBitsVi4Vi7Z9sliceBits6__initZ<-
+[VERBOSE-DEBUG] ->_D11DirectSound6dsound12MAKE_HRESULTFkkkZi<-
+[VERBOSE-DEBUG] ->_D76TypeInfo_S3std8internal14unicode_tables25__T9TrieEntryTbVi8Vi6Vi7Z9TrieEntry6__initZ<-
+[VERBOSE-DEBUG] ->_D3std6format18__T10FormatSpecTaZ10FormatSpec6__initZ<-
+[VERBOSE-DEBUG] ->_D44TypeInfo_S11DirectSound6dsound12DSBUFFERDESC6__initZ<-
+[VERBOSE-DEBUG] ->_D50TypeInfo_S3std3uni20__T9sliceBitsVi4Vi7Z9sliceBits6__initZ<-
+[VERBOSE-DEBUG] ->_D3std3uni19__T9BitPackedTkVi2Z9BitPacked6__initZ<-
+[VERBOSE-DEBUG] ->_D49TypeInfo_S3std3uni19__T9BitPackedTkVi2Z9BitPacked6__initZ<-
+SUCCESS
+format MS COFF
+
+
+public _D11DirectSound6dsound16IID_IDirectSoundxS3std1c7windows3com4GUID
+public _D11DirectSound6dsound17CLSID_DirectSoundxS3std1c7windows3com4GUID
+
+BUILD-[]: execute dmd -version=CL_VERSION_1_1 -defaultlib= -c -release  -J. -op DirectSound/dsound.d
+BUILD-[]: execute C:\Users\r0b3\files\programme\objconv\objconvOld -fnasm DirectSound/dsound.obj
+BUILD-[]: execute python replaceStrangeSymbols.py DirectSound/dsound.asm
+BUILD-[]: execute python transcriberTool.py DirectSound/dsound symbols
+[E]
+====================
+C:\Users\r0b3\files\backuped\own_dropbox\programmierung\raymarcher0\Transcriber.py:356: SyntaxWarning: assertion is always true, perhaps remove parentheses?
+  assert(False, "Should be unreachable!")
+C:\Users\r0b3\files\backuped\own_dropbox\programmierung\raymarcher0\Transcriber.py:388: SyntaxWarning: assertion is always true, perhaps remove parentheses?
+  assert(False, "No section Found which contains label - Should be unreachable!")
+C:\Users\r0b3\files\backuped\own_dropbox\programmierung\raymarcher0\Transcriber.py:414: SyntaxWarning: assertion is always true, perhaps remove parentheses?
+  assert(False, "TODO")
+

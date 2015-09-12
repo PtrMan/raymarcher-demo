@@ -1,0 +1,2 @@
+.text$_D6Window9myWinMainFPvPvPaiPFPvPvZvPFPvPvZvPvZi
+.text$_WndProc@16

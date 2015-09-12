@@ -1,0 +1,2 @@
+.text$_D16ScopeGuardMemory16ScopeGuardMemory6__ctorMFNbNcPvZS16ScopeGuardMemory16ScopeGuardMemory
+.text$_D16ScopeGuardMemory16ScopeGuardMemory6__dtorMFNbZv

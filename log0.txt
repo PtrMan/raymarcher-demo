@@ -1,0 +1,790 @@
+start
+HERE 40000000
+DEBUG here 505005------(3)
+DEBUG hedfddffre 505005
+DEBUG here 505005
+HERE 5000
+finish [2]
+#define OPENCL 1
+
+// needed def stuff, actually in other files
+
+#define Vector3 float3
+#define Vector2 float2
+ 
+#define EPSILON 0.000255f
+ 
+#define PI 3.14159265359f
+
+float mathAbs(float A)
+{
+	if( A < 0.0f )
+	{
+		return -A;
+	}
+	return A;
+}
+
+// math wrapper for cuda/openCL
+#if OPENCL
+
+#define fastSin native_sin
+#define fastCos native_cos
+
+#else
+
+#define fastSin __sinf
+#define fastCos __cosf
+
+#endif
+
+
+// wrapper for cuda/openCL
+#if OPENCL
+
+#define DEVICEFN
+
+// TODO< force? >
+#define FORCEINLINE inline
+
+#else
+
+#define DEVICEFN __device__
+#define FORCEINLINE __forceinline__
+
+#endif
+
+// wrapper for cuda/opencl
+#if OPENCL
+
+#define CREATEFLOAT2 (float2)
+#define CREATEFLOAT3 (float3)
+
+#else
+
+#define CREATEFLOAT2 make_float2
+#define CREATEFLOAT3 make_float3
+
+// hack
+#define uint int
+
+#endif
+
+// wrapper for cuda/opencl
+#if OPENCL
+#else
+
+// orginal
+// from http://bullet.googlecode.com/svn/trunk/Extras/CUDA/cutil_math.h
+// (changed)
+
+
+// multiply
+inline __host__ __device__ float3 operator*(float3 a, float b)
+{
+    return make_float3(a.x * b, a.y * b, a.z * b);
+}
+
+inline __host__ __device__ float3 operator*=(float3 a, float3 b)
+{
+    return make_float3(a.x * b.x, a.y * b.y, a.z * b.z);
+}
+
+inline __host__ __device__ float3 operator-(float3 a, float3 b)
+{
+    return make_float3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+inline __host__ __device__ float3 operator+(float3 a, float3 b)
+{
+    return make_float3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+// dot product
+inline __host__ __device__ float dot(float3 a, float3 b)
+{ 
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+// normalize
+inline __host__ __device__ float3 normalize(float3 v)
+{
+    float invLen = 1.0f / sqrtf(dot(v, v));
+    return v * invLen;
+}
+
+
+
+#endif
+
+DEVICEFN float dist(Vector3 A, Vector3 B)
+{
+	Vector3 Distance = A - B;
+	Distance *= Distance;
+	return sqrt(Distance.x + Distance.y + Distance.z);
+}
+
+float fastNegCorrectfmodFor2Pi(float value)
+{
+	return fmod(value + 20.0f*2.0f*PI, 2.0f*PI);
+}
+
+float mathFastSinBound(float x)
+{
+    float x2 = x/PI;
+
+    return 0.0f + 3.09012f*x2 - 4.74829f * x2*x2*x2 + 1.66452f * x2*x2*x2*x2*x2;
+}
+
+float mathFastSinUnbound(float x)
+{
+	float x2 = x + PI;
+	float x3 = fastNegCorrectfmodFor2Pi(x2);
+	float x4 = x3 - PI;
+
+	return mathFastSinBound(x4);
+}
+
+float mathFastCosUnbound(float x)
+{
+	return mathFastSinUnbound(PI/2.0f - x);
+}
+
+#define CREATEVECTOR3 CREATEFLOAT3
+
+/////////////////////////////////////////////////
+///////////////////////////////////////////////
+
+// complex number library
+
+// code is partly from http://stackoverflow.com/questions/10016125/complex-number-support-in-opencl
+
+// 2 component vector to hold the real and imaginary parts of a complex number
+typedef float2 ComplexFloat;
+
+#define CREATECOMPLEXFLOAT CREATEFLOAT2
+
+/*inline*/ DEVICEFN ComplexFloat cmul(ComplexFloat a, ComplexFloat b)
+{
+	return CREATECOMPLEXFLOAT(a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x);
+}
+
+// precision is standard precision
+// TODO< use own approximation as replacement for trianglular fn-s? >
+/*inline*/ DEVICEFN ComplexFloat cexp(float i)
+{
+	return CREATECOMPLEXFLOAT(cos(i), sin(i));
+}
+
+/*inline*/ DEVICEFN ComplexFloat cscale(ComplexFloat input, float scalar)
+{
+	return CREATECOMPLEXFLOAT(input.x*scalar, input.y*scalar);
+}
+
+///////////////////////////////////////////////
+
+
+
+// TODO<
+//    replace it with a more ellegant non-copy solution, for example a offset into a global const array 
+//
+//    this also removed the need to pass arround the pointer, because it is global
+// >
+
+/*
+DEVICEFN float calculateShDegree3ApproximationDegree4(float theta, float phi, int shCoefficientOffsetNotUsed, ComplexFloat *shCoefficientsLocalForInstance)
+{
+	float result;
+	float cosTheta;
+
+	// some calculating because we repeat this A LOT
+	cosTheta = fastCos(theta);
+
+	float cosTheta2 = cosTheta*cosTheta;
+	float cosTheta3 = cosTheta*cosTheta2;
+	float cosTheta4 = cosTheta2*cosTheta2;
+	float cosTheta5 = cosTheta2*cosTheta3;
+	float cosTheta6 = cosTheta3*cosTheta3;
+	float cosTheta7 = cosTheta4*cosTheta3;
+	float cosTheta8 = cosTheta4*cosTheta4;
+	float cosTheta9 = cosTheta4*cosTheta5;
+	float cosTheta10 = cosTheta5*cosTheta5;
+	float cosTheta11 = cosTheta6*cosTheta5;
+	float cosTheta12 = cosTheta6*cosTheta6;
+	float cosTheta13 = cosTheta7*cosTheta6;
+	float cosTheta14 = cosTheta7*cosTheta7;
+	float cosTheta15 = cosTheta8*cosTheta7;
+	float cosTheta16 = cosTheta8*cosTheta8;
+	float cosTheta17 = cosTheta9*cosTheta8;
+	float cosTheta18 = cosTheta9*cosTheta9;
+	float cosTheta19 = cosTheta10*cosTheta9;
+	float cosTheta20 = cosTheta10*cosTheta10;
+	float cosTheta21 = cosTheta11*cosTheta10;
+	float cosTheta22 = cosTheta11*cosTheta11;
+	float cosTheta23 = cosTheta12*cosTheta11;
+	float cosTheta24 = cosTheta12*cosTheta12;
+
+
+	float scale_0_0 = 0.28209479177387814f;
+
+	float scale_1_m1 = 0.34497957981656374f -0.12597887238437466f*cosTheta2 - 0.716888485584222f*cosTheta4 + 3.470605541110635f*cosTheta6 - 8.101872075298857f*cosTheta8 + 8.562995343629336f*cosTheta10 - 3.41029351833622f*cosTheta12;
+	float scale_1_0 = 0.4886025119029199f*cosTheta;
+	float scale_1_p1 = -0.34497957981656374f + 0.12597887238437372f*cosTheta2 + 0.7168884855842379f*cosTheta4 - 3.470605541110714f*cosTheta6 + 8.101872075299028f*cosTheta8 - 8.562995343629503f*cosTheta10 + 3.4102935183362812f*cosTheta12;
+
+	float scale_2_m2 = 0.3862742020231895f - 0.3862742020231895f*cosTheta2;
+	float scale_2_m1 = 0.7756185001284441f*cosTheta - 0.7025533832036146f*cosTheta3 + 9.427393031244838f*cosTheta5 - 131.19598605289417f*cosTheta7 + 995.2599829558754f*cosTheta9 - 4582.21137459663f*cosTheta11 + 13463.97737893224f*cosTheta13 - 25790.796080152886f*cosTheta15 + 32054.714003230154f*cosTheta17 - 24909.024236630037f*cosTheta19 + 10991.847818143666f*cosTheta21 - 2102.040939237662f*cosTheta23;
+	float scale_2_0 = -0.31539156525252f + 0.9461746957575601f*cosTheta2;
+	float scale_2_p1 = -0.7756185001284445f*cosTheta + 0.7025533832036839f*cosTheta3 - 9.427393031246663f*cosTheta5 + 131.19598605291554f*cosTheta7 - 995.2599829560149f*cosTheta9 + 4582.2113745971865f*cosTheta11 - 13463.97737893368f*cosTheta13 + 25790.796080155356f*cosTheta15 - 32054.71400323296f*cosTheta17 + 24909.02423663205f*cosTheta19 - 10991.847818144493f*cosTheta21 + 2102.0409392378106f*cosTheta23;
+	float scale_2_p2 = 0.38627420202318963f - 0.3862742020231895f*cosTheta2;
+
+	float scale_3_m3 = 0.4167946376911281f - 0.6123900178543088f*cosTheta2 + 0.09680208881021282f*cosTheta4 + 0.09640600683645939f*cosTheta6;
+	float scale_3_m2 = 1.0219854764332825f*cosTheta - 1.0219854764332827f*cosTheta3;
+	float scale_3_m1 = -0.3233652944298241f + 1.8398765619392337f*cosTheta2 - 4.210072264775134f*cosTheta4 + 73.5213437327619f*cosTheta6 - 808.6771112943695f*cosTheta8 + 5196.564394907908f*cosTheta10 - 21038.55302011983f*cosTheta12 + 55756.38639403354f*cosTheta14 - 98086.2518961287f*cosTheta16 + 113470.78799484581f*cosTheta18 - 82920.56142885867f*cosTheta20 + 34689.23953638362f*cosTheta22 - 6329.712605254259f*cosTheta24;
+	float scale_3_0 = -1.1195289977703464f*cosTheta + 1.8658816629505772f*cosTheta3;
+	float scale_3_p1 = 0.32336529442982415f - 1.8398765619392299f*cosTheta2 + 4.210072264774875f*cosTheta4 - 73.5213437327566f*cosTheta6 + 808.6771112943175f*cosTheta8 - 5196.564394907613f*cosTheta10 + 21038.553020118798f*cosTheta12 - 55756.38639403119f*cosTheta14 + 98086.25189612519f*cosTheta16 - 113470.78799484242f*cosTheta18 + 82920.5614288566f*cosTheta20 - 34689.239536382905f*cosTheta22 + 6329.712605254152f*cosTheta24;
+	float scale_3_p2 = 1.0219854764332825f*cosTheta - 1.0219854764332823f*cosTheta3;
+	float scale_3_p3 = -0.4167946376911281f + 0.6123900178543092f*cosTheta2 - 0.09680208881021427f*cosTheta4 - 0.09640600683645828f*cosTheta6;
+
+
+	// using the sinus/cosinus identities we can save A LOT of sin/cos calls
+	float sinPhi = fastSin(phi);
+	float cosPhi = fastCos(phi);
+
+	float sinPhi2 = 2.0f*sinPhi*cosPhi;
+	float cosPhi2 = 2.0f*cosPhi*cosPhi-1.0f;
+
+	float sinPhi3 = 3.0f*sinPhi - 4.0f*sinPhi*sinPhi*sinPhi;
+	float cosPhi3 = 4.0f*cosPhi*cosPhi*cosPhi - 3.0f*cosPhi;
+
+	ComplexFloat cexpm1 = CREATECOMPLEXFLOAT(cosPhi, -sinPhi);
+	ComplexFloat cexpp1 = CREATECOMPLEXFLOAT(cosPhi, sinPhi);
+	ComplexFloat cexpm2 = CREATECOMPLEXFLOAT(cosPhi2, -sinPhi2);
+	ComplexFloat cexpp2 = CREATECOMPLEXFLOAT(cosPhi2, sinPhi2);
+	ComplexFloat cexpm3 = CREATECOMPLEXFLOAT(cosPhi3, -sinPhi3);
+	ComplexFloat cexpp3 = CREATECOMPLEXFLOAT(cosPhi3, sinPhi3);
+	
+
+	result = 0.282095f * shCoefficientsLocalForInstance[0].x; // special
+
+	result += cmul(cscale(cexpm1, scale_1_m1), shCoefficientsLocalForInstance[1]).x;
+	result += scale_1_0*shCoefficientsLocalForInstance[2].x; // special
+	result += cmul(cscale(cexpp1, scale_1_p1), shCoefficientsLocalForInstance[3]).x;
+
+	
+	result += cmul(cscale(cexpm2, scale_2_m2), shCoefficientsLocalForInstance[4]).x;
+	result += cmul(cscale(cexpm1, scale_2_m1), shCoefficientsLocalForInstance[5]).x;
+	result += scale_2_0*shCoefficientsLocalForInstance[6].x; // special
+	result += cmul(cscale(cexpp1, scale_2_p1), shCoefficientsLocalForInstance[7]).x;
+	result += cmul(cscale(cexpp2, scale_2_p2), shCoefficientsLocalForInstance[8]).x;
+	
+	
+	result += cmul(cscale(cexpm3, scale_3_m3), shCoefficientsLocalForInstance[9]).x;
+	result += cmul(cscale(cexpm2, scale_3_m2), shCoefficientsLocalForInstance[10]).x;
+	result += cmul(cscale(cexpm1, scale_3_m1), shCoefficientsLocalForInstance[11]).x;
+	result += scale_3_0*shCoefficientsLocalForInstance[12].x; // special
+	result += cmul(cscale(cexpp1, scale_3_p1), shCoefficientsLocalForInstance[13]).x;
+	result += cmul(cscale(cexpp2, scale_3_p2), shCoefficientsLocalForInstance[14]).x;
+	result += cmul(cscale(cexpp3, scale_3_p3), shCoefficientsLocalForInstance[15]).x;
+	
+
+	return result;
+}
+*/
+
+
+
+
+DEVICEFN float calculateShDegree3Accelerated(float y, float phiX, float phiY, int shCoefficientOffsetNotUsed, ComplexFloat *shCoefficientsLocalForInstance)
+{
+	float y2 = y*y;
+	float y3 = y2*y;
+	float y4 = y2*y2;
+	float y5 = y3*y2;
+	float y6 = y3*y3;
+	float y7 = y4*y3;
+	float _1my2 = 1.0f - y2;
+	float y2m1 = y2 - 1.0f;
+
+	float y2m1power2 = y2m1*y2m1;
+	float y2m1power3 = y2m1*y2m1*y2m1;
+	float y2m1power4 = y2m1power2*y2m1power2;
+	float y2m1power5 = y2m1power3*y2m1power2;
+	float y2m1power6 = y2m1power3*y2m1power3;
+	float y2m1power7 = y2m1power4*y2m1power3;
+
+	float sinPhiM0 = 1.0f;
+	float sinPhiM1 = sqrt(_1my2);
+	float sinPhiM2 = _1my2;
+	float sinPhiM3 = sinPhiM2*sinPhiM1;
+	float sinPhiM4 = sinPhiM2*sinPhiM2;
+
+	float sinPhiMm1 = 1.0f/sinPhiM1;
+	float sinPhiMm2 = sinPhiMm1*sinPhiMm1;
+	float sinPhiMm3 = sinPhiMm2*sinPhiMm1;
+	float sinPhiMm4 = sinPhiMm2*sinPhiMm2;
+
+	// this is the combined drivation of the x^2 - 1 term in the complex legendre polynominal
+	// with the factor in the legendre Polynominal and the term with the faculty in the legendre polynominal
+	// this got also multiplied by the external factor
+	
+	float combined_0_m0 = 0.282095f;
+
+	float combined_1_mp1 = -0.345494f;
+	float combined_1_m0 = 0.488603f*y;
+	float combined_1_mm1 = -0.345494f*y2m1;
+
+	float combined_2_mp2 = 0.386274f;
+	float combined_2_mp1 = -0.772548f*y;
+	float combined_2_m0 = 0.0788479f*(8.0f*y2 + 4.0f*y2m1);
+	float combined_2_mm1 = combined_2_mp1*y2m1;
+	float combined_2_mm2 = 0.386274f*y2m1*y2m1;
+
+	float combined_3_mp3 = -0.417224f;
+	float combined_3_mp2 = 1.02199f*y;
+	float combined_3_mp1 = -0.00448861f*(288.0f*y2 + 72.0f*y2m1);
+	float combined_3_m0 = 0.015549f*(48.0f*y3 + 72.0f*y*y2m1);
+	float combined_3_mm1 = -0.0538634f*(24.0f*y2*y2m1 + 6.0f*y2m1*y2m1);
+	float combined_3_mm2 = combined_3_mp2*y2m1*y2m1;
+	float combined_3_mm3 = -0.417224f*y2m1*y2m1*y2m1;
+
+	// new naming convention
+	float combined_4_4 = 0.442533f;
+	float combined_4_3 = -1.25167f*y;
+	float combined_4_2 = 0.000116154f*(17280.0f*y2 + 2880.0f*y2m1);
+	float combined_4_1 = -0.000492799f*(3840.0f*y3 + 2880.0f*y*y2m1);
+	float combined_4_0 = 0.00220387f*(384.0f*y4 + 1152.0f*y2*y2m1 + 144.0f*y2m1*y2m1);
+	float combined_4_m1 = -0.00985599f*(192.0f*y3*y2m1 + 144.0f*y*y2m1*y2m1);
+	float combined_4_m2 = 0.0418154f*(48.0f*y2*y2m1*y2m1 + 8.0f*y2m1*y2m1*y2m1);
+	float combined_4_m3 = -1.25167f*y*y2m1*y2m1*y2m1;
+	float combined_4_m4 = 0.442533f*y2m1*y2m1*y2m1*y2m1;
+
+	// auto generated
+	float combined_5_m5 = -0.46413220344085815f*y2m1*y2m1*y2m1*y2m1*y2m1;// Power(y2m1,5);
+	float combined_5_m4 = 1.467714898305751f*y*y2m1*y2m1*y2m1*y2m1; // Power(y2m1,4);
+	float combined_5_m3 = -0.03459437191468402f*(80.0f*y2*y2m1*y2m1*y2m1 + 10.0f*y2m1*y2m1*y2m1*y2m1);
+	float combined_5_m2 = 0.007061546596920414*(480.0f*y3*y2m1 + 240.0f*y*y2m1*y2m1*y2m1);
+	float combined_5_m1 = -0.001334506869067563f*(1920.0f*y4*(y2m1) + 2880.0f*y2*y2m1*y2m1 + 240.0f*y2m1*y2m1*y2m1);
+	float combined_5_0 = 0.00024364650511129917f*(3840.0f*y5 + 19200.0f*y3*(y2m1) + 7200.0f*y*y2m1*y2m1);
+	float combined_5_1 = -0.0000444835623022521f*(57600.0f*y4 + 86400.0f*y2*(y2m1) + 7200.0f*y2m1*y2m1);
+	float combined_5_2 = 8.40660309157192e-6f*(403200.0f*y3 + 201600.0f*y*(y2m1));
+	float combined_5_3 = -1.7159906703712312e-6f*(1.6128e6f*y2 + 201600.0f*(y2m1));
+	float combined_5_4 = 1.467714898305751f*y;
+	float combined_5_5 = -0.46413220344085815f;
+
+	// auto generated with power
+	float combined_6_m6 = 0.48308411358006625f*y2m1power6;
+	float combined_6_m5 = -1.673452458100098f*y*y2m1power5;
+	float combined_6_m4 = 0.029731771904499837f*(120.0f*y2*y2m1power4 + 12.0f*y2m1power5);
+	float combined_6_m3 = -0.005428254048897631f*(960.0f*y3*y2m1power3 + 360.0f*y*y2m1power4);
+	float combined_6_m2 = 0.0009047090081496052f*(5760.0f*y4*y2m1power2 + 5760.0f*y2*y2m1power3 + 360.0f*y2m1power4);
+	float combined_6_m1 = -0.00014304705427122943f*(23040.0f*y5*(y2m1) + 57600.0f*y3*y2m1power2 + 14400.0f*y*y2m1power3);
+	float combined_6_0 = 0.00002207263967625987f*(46080.0f*y6 + 345600.0f*y4*(y2m1) + 259200.0f*y2*y2m1power2 + 14400.0f*y2m1power3);
+	float combined_6_1 = -3.4058822445530823e-6f*(967680.0f*y5 + 2.4192e6f*y3*(y2m1) + 604800.0f*y*y2m1power2);
+	float combined_6_2 = 5.385172667557175e-7f*(9.6768e6f*y4 + 9.6768e6f*y2*(y2m1) + 604800.0f*y2m1power2);
+	float combined_6_3 = -8.975287779261958e-8f*(5.80608e7f*y3 + 2.17728e7f*y*(y2m1));
+	float combined_6_4 = 1.638655858934074e-8f*(2.17728e8f*y2 + 2.17728e7f*(y2m1));
+	float combined_6_5 = -1.673452458100098f*y;
+	float combined_6_6 = 0.48308411358006625f;
+
+	float combined_7_m7 = -0.5000395635705507f*y2m1power7;
+	float combined_7_m6 = 1.8709767267129689f*y*y2m1power6;
+	float combined_7_m5 = -0.026209194612602703f*(168.0f*y2*y2m1power5 + 14.0f*y2m1power6);
+	float combined_7_m4 = 0.00436819910210045f*(1680.0f*y3*y2m1power4 + 504.0f*y*y2m1power5);
+	float combined_7_m3 = -0.0006585307923288432f*(13440.0f*y4*y2m1power3 + 10080.0f*y2*y2m1power4 + 504.0f*y2m1power5);
+	float combined_7_m2 = 0.00009313031777517501f*(80640.0f*y5*y2m1power2 + 134400.0f*y3*y2m1power3 + 25200.0f*y*y2m1power4);
+	float combined_7_m1 = -0.000012673431007357172f*(322560.0f*y6*(y2m1) + 1.2096e6f*y4*y2m1power2 + 604800.0f*y2*y2m1power3 + 25200.0f*y2m1power4);
+	float combined_7_0 = 1.693558455158853e-6f*(645120.0f*y7 + 6.77376e6f*y5*(y2m1) + 8.4672e6f*y3*y2m1power2 + 1.4112e6f*y*y2m1power3);
+	float combined_7_1 = -2.2631126798852092e-7f*(1.806336e7f*y6 + 6.77376e7f*y4*(y2m1) + 3.38688e7f*y2*y2m1power2 + 1.4112e6*y2m1power3);
+	float combined_7_2 = 3.0797062756340945e-8f*(2.4385536e8f*y5 + 4.064256e8f*y3*(y2m1) + 7.62048e7f*y*y2m1power2);
+	float combined_7_3 = -4.35536238312727e-9f*(2.032128e9f*y4 + 1.524096e9f*y2*(y2m1) + 7.62048e7f*y2m1power2);
+	float combined_7_4 = 6.565955841300581e-10f*(1.1176704e10f*y3 + 3.3530112e9f*y*(y2m1));
+	float combined_7_5 = -1.0943259735500968e-10f*(4.02361344e10f*y2 + 3.3530112e9f*(y2m1));
+	float combined_7_6 = 1.8709767267129689f*y;
+	float combined_7_7 = -0.5000395635705507f;
+
+
+	// TODO< more terms >
+
+	// multiply the values with the cos term of the complex legendre polynominal
+
+	float scale_0_0 = combined_0_m0;
+
+	float scale_1_m1 = combined_1_mm1 * sinPhiMm1;
+	float scale_1_0 = combined_1_m0;
+	float scale_1_p1 = combined_1_mp1 * sinPhiM1;
+
+	float scale_2_m2 = combined_2_mm2 * sinPhiMm2;
+	float scale_2_m1 = combined_2_mm1 * sinPhiMm1;
+	float scale_2_0 = combined_2_m0;
+	float scale_2_p1 = combined_2_mp1 * sinPhiM1;
+	float scale_2_p2 = combined_2_mp2 * sinPhiM2;
+
+	float scale_3_m3 = combined_3_mm3 * sinPhiMm3;
+	float scale_3_m2 = combined_3_mm2 * sinPhiMm2;
+	float scale_3_m1 = combined_3_mm1 * sinPhiMm1;
+	float scale_3_0 = combined_3_m0;
+	float scale_3_p1 = combined_3_mp1 * sinPhiM1;
+	float scale_3_p2 = combined_3_mp2 * sinPhiM2;
+	float scale_3_p3 = combined_3_mp3 * sinPhiM3;
+
+	float scale_4_m4 = combined_4_m4 * sinPhiMm4;
+	float scale_4_m3 = combined_4_m3 * sinPhiMm3;
+	float scale_4_m2 = combined_4_m2 * sinPhiMm2;
+	float scale_4_m1 = combined_4_m1 * sinPhiMm1;
+	float scale_4_0 = combined_4_0;
+	float scale_4_1 = combined_4_1 * sinPhiM1;
+	float scale_4_2 = combined_4_2 * sinPhiM2;
+	float scale_4_3 = combined_4_3 * sinPhiM3;
+	float scale_4_4 = combined_4_4 * sinPhiM4;
+
+
+
+
+
+	// TODO< the other funny stuff >
+
+	// using the sinus/cosinus identities we can save A LOT of sin/cos calls
+	float sinPhi = phiX;
+	float cosPhi = phiY;
+
+	float sinPhi2 = 2.0f*sinPhi*cosPhi;
+	float cosPhi2 = 2.0f*cosPhi*cosPhi-1.0f;
+
+	float sinPhi3 = 3.0f*sinPhi - 4.0f*sinPhi*sinPhi*sinPhi;
+	float cosPhi3 = 4.0f*cosPhi*cosPhi*cosPhi - 3.0f*cosPhi;
+
+	ComplexFloat cexpm1 = CREATECOMPLEXFLOAT(cosPhi, -sinPhi);
+	ComplexFloat cexpp1 = CREATECOMPLEXFLOAT(cosPhi, sinPhi);
+	ComplexFloat cexpm2 = CREATECOMPLEXFLOAT(cosPhi2, -sinPhi2);
+	ComplexFloat cexpp2 = CREATECOMPLEXFLOAT(cosPhi2, sinPhi2);
+	ComplexFloat cexpm3 = CREATECOMPLEXFLOAT(cosPhi3, -sinPhi3);
+	ComplexFloat cexpp3 = CREATECOMPLEXFLOAT(cosPhi3, sinPhi3);
+	
+	float result;
+
+	result = scale_0_0 * shCoefficientsLocalForInstance[0].x; // special
+
+	result += cmul(cscale(cexpm1, scale_1_m1), shCoefficientsLocalForInstance[1]).x;
+	result += scale_1_0*shCoefficientsLocalForInstance[2].x; // special
+	result += cmul(cscale(cexpp1, scale_1_p1), shCoefficientsLocalForInstance[3]).x;
+
+	result += cmul(cscale(cexpm2, scale_2_m2), shCoefficientsLocalForInstance[4]).x;
+	result += cmul(cscale(cexpm1, scale_2_m1), shCoefficientsLocalForInstance[5]).x;
+	result += scale_2_0*shCoefficientsLocalForInstance[6].x; // special
+	result += cmul(cscale(cexpp1, scale_2_p1), shCoefficientsLocalForInstance[7]).x;
+	result += cmul(cscale(cexpp2, scale_2_p2), shCoefficientsLocalForInstance[8]).x;
+	
+
+	result += cmul(cscale(cexpm3, scale_3_m3), shCoefficientsLocalForInstance[9]).x;
+	result += cmul(cscale(cexpm2, scale_3_m2), shCoefficientsLocalForInstance[10]).x;
+	result += cmul(cscale(cexpm1, scale_3_m1), shCoefficientsLocalForInstance[11]).x;
+	result += scale_3_0*shCoefficientsLocalForInstance[12].x; // special
+	result += cmul(cscale(cexpp1, scale_3_p1), shCoefficientsLocalForInstance[13]).x;
+	result += cmul(cscale(cexpp2, scale_3_p2), shCoefficientsLocalForInstance[14]).x;
+	result += cmul(cscale(cexpp3, scale_3_p3), shCoefficientsLocalForInstance[15]).x;
+	
+	return result;
+}
+
+
+
+/*
+
+DEVICEFN float calculateShDegree3Accelerated2(float y, float phiX, float phiY, int shCoefficientOffsetNotUsed, ComplexFloat *shCoefficientsLocalForInstance)
+{
+float _1m2y_power_1p0 = 1.0f-y*y;
+float _1m2y_power_2p0 = _1m2y_power_1p0*_1m2y_power_1p0;
+float _1m2y_power_3p0 = _1m2y_power_1p0*_1m2y_power_2p0;
+float _1m2y_power_4p0 = _1m2y_power_2p0*_1m2y_power_2p0;
+float _1m2y_power_0p5 = sqrt(_1m2y_power_1p0);
+float _1m2y_power_1p5 = _1m2y_power_1p0*_1m2y_power_0p5;
+float _1m2y_power_2p5 = _1m2y_power_2p0*_1m2y_power_0p5;
+
+float legendre_0_0 = 1.0f;
+float legendre_1_0 = y*legendre_0_0;
+float legendre_1_1 = 0.7071067811865475f*_1m2y_power_0p5;
+float legendre_2_0 = -0.5f*legendre_0_0 + 1.5f*y*legendre_1_0;
+float legendre_2_1 = 1.7320508075688772f*y*legendre_1_1;
+float legendre_2_2 = 0.6123724356957945f*(_1m2y_power_1p0);
+float legendre_3_0 = -0.6666666666666666f*legendre_1_0 + 1.6666666666666667f*y*legendre_2_0;
+float legendre_3_1 = -0.6123724356957945f*legendre_1_1 + 1.7677669529663687f*y*legendre_2_1;
+float legendre_3_2 = 2.23606797749979f*y*legendre_2_2;
+float legendre_3_3 = 0.5590169943749475f*_1m2y_power_1p5;
+float legendre_4_0 = -0.75f*legendre_2_0 + 1.75f*y*legendre_3_0;
+float legendre_4_1 = -0.7302967433402214f*legendre_2_1 + 1.8073922282301278f*y*legendre_3_1;
+float legendre_4_2 = -0.6454972243679028f*legendre_2_2 + 2.0207259421636903f*y*legendre_3_2;
+float legendre_4_3 = 2.6457513110645907f*y*legendre_3_3;
+float legendre_4_4 = 0.5229125165837972f*_1m2y_power_2p0;
+
+float yScale_0_0 = 0.28209479177387814f*legendre_0_0;
+float yScale_1_0 = 0.4886025119029199f*legendre_1_0;
+float yScale_1_1 = 0.4886025119029199f*legendre_1_1;
+float yScale_2_0 = 0.6307831305050401f*legendre_2_0;
+float yScale_2_1 = 0.6307831305050401f*legendre_2_1;
+float yScale_2_2 = 0.6307831305050401f*legendre_2_2;
+float yScale_3_0 = 0.7463526651802308f*legendre_3_0;
+float yScale_3_1 = 0.7463526651802308f*legendre_3_1;
+float yScale_3_2 = 0.7463526651802308f*legendre_3_2;
+float yScale_3_3 = 0.7463526651802308f*legendre_3_3;
+float yScale_4_0 = 0.8462843753216345f*legendre_4_0;
+float yScale_4_1 = 0.8462843753216345f*legendre_4_1;
+float yScale_4_2 = 0.8462843753216345f*legendre_4_2;
+float yScale_4_3 = 0.8462843753216345f*legendre_4_3;
+float yScale_4_4 = 0.8462843753216345f*legendre_4_4;
+// =======
+// evaluation of the Y terms
+// =======
+
+// using the sinus/cosinus identities and the chebyshev method we can save A LOT of sin/cos calls
+// chebyshev method http://www.trans4mind.com/personal_development/mathematics/trigonometry/multipleAnglesRecursiveFormula.htm
+float sinPhi = phiX;
+float cosPhi = phiY;
+ComplexFloat cexpm1 = CREATECOMPLEXFLOAT(cosPhi, -sinPhi);
+ComplexFloat cexpp1 = CREATECOMPLEXFLOAT(cosPhi, sinPhi);
+
+float sinPhi2 = 2.0f*sinPhi*cosPhi;
+float cosPhi2 = 2.0f*cosPhi*cosPhi-1.0f;
+ComplexFloat cexpm2 = CREATECOMPLEXFLOAT(cosPhi2, -sinPhi2);
+ComplexFloat cexpp2 = CREATECOMPLEXFLOAT(cosPhi2, sinPhi2);
+
+// helper variable which speeds up the calculations again
+float cosPhi_2_x = 2.0f*cosPhi*x;
+
+float cosPhi3 = cosPhi_2_x*cosPhi2 - cosPhi1*x;
+float sinPhi3 = cosPhi_2_x*sinPhi2 - sinPhi1*x;
+ComplexFloat cexpm3 = CREATECOMPLEXFLOAT(cosPhi3, -sinPhi3);
+ComplexFloat cexpp3 = CREATECOMPLEXFLOAT(cosPhi3, sinPhi3);
+
+float cosPhi4 = cosPhi_2_x*cosPhi3 - cosPhi2*x;
+float sinPhi4 = cosPhi_2_x*sinPhi3 - sinPhi2*x;
+ComplexFloat cexpm4 = CREATECOMPLEXFLOAT(cosPhi4, -sinPhi4);
+ComplexFloat cexpp4 = CREATECOMPLEXFLOAT(cosPhi4, sinPhi4);
+
+
+float result = 0.0f;
+
+result += yscale_0_0 * shCoefficientsLocalForInstance[0].x; // special
+
+result += cmul(cscale(cexpm1,yscale_1_1),shCoefficientsLocalForInstance[1]).x;
+result += yscale_1_0 * shCoefficientsLocalForInstance[2].x; // special
+result += cmul(cscale(cexpp1,yscale_1_1),shCoefficientsLocalForInstance[3]).x;
+
+result += cmul(cscale(cexpm2,yscale_2_2),shCoefficientsLocalForInstance[4]).x;
+result += cmul(cscale(cexpm1,yscale_2_1),shCoefficientsLocalForInstance[5]).x;
+result += yscale_2_0 * shCoefficientsLocalForInstance[6].x; // special
+result += cmul(cscale(cexpp1,yscale_2_1),shCoefficientsLocalForInstance[7]).x;
+result += cmul(cscale(cexpp2,yscale_2_2),shCoefficientsLocalForInstance[8]).x;
+
+result += cmul(cscale(cexpm3,yscale_3_3),shCoefficientsLocalForInstance[9]).x;
+result += cmul(cscale(cexpm2,yscale_3_2),shCoefficientsLocalForInstance[10]).x;
+result += cmul(cscale(cexpm1,yscale_3_1),shCoefficientsLocalForInstance[11]).x;
+result += yscale_3_0 * shCoefficientsLocalForInstance[12].x; // special
+result += cmul(cscale(cexpp1,yscale_3_1),shCoefficientsLocalForInstance[13]).x;
+result += cmul(cscale(cexpp2,yscale_3_2),shCoefficientsLocalForInstance[14]).x;
+result += cmul(cscale(cexpp3,yscale_3_3),shCoefficientsLocalForInstance[15]).x;
+
+result += cmul(cscale(cexpm4,yscale_4_4),shCoefficientsLocalForInstance[16]).x;
+result += cmul(cscale(cexpm3,yscale_4_3),shCoefficientsLocalForInstance[17]).x;
+result += cmul(cscale(cexpm2,yscale_4_2),shCoefficientsLocalForInstance[18]).x;
+result += cmul(cscale(cexpm1,yscale_4_1),shCoefficientsLocalForInstance[19]).x;
+result += yscale_4_0 * shCoefficientsLocalForInstance[20].x; // special
+result += cmul(cscale(cexpp1,yscale_4_1),shCoefficientsLocalForInstance[21]).x;
+result += cmul(cscale(cexpp2,yscale_4_2),shCoefficientsLocalForInstance[22]).x;
+result += cmul(cscale(cexpp3,yscale_4_3),shCoefficientsLocalForInstance[23]).x;
+result += cmul(cscale(cexpp4,yscale_4_4),shCoefficientsLocalForInstance[24]).x;
+	
+	return result;
+}
+
+*/
+
+
+
+
+/// actually user code
+
+DEVICEFN void initializeShCoefficients(ComplexFloat *shCoefficientsLocalForInstance)
+{
+	shCoefficientsLocalForInstance[0] = CREATECOMPLEXFLOAT(1.66369f, 0.0f);
+
+	shCoefficientsLocalForInstance[1] = CREATECOMPLEXFLOAT(0.000570318f, -0.000960745f);
+	shCoefficientsLocalForInstance[2] = CREATECOMPLEXFLOAT(0.000452968f, 0.0f);
+	shCoefficientsLocalForInstance[3] = CREATECOMPLEXFLOAT(-0.000570318f, -0.000960745f);
+
+	shCoefficientsLocalForInstance[4] = CREATECOMPLEXFLOAT(-0.00204878f, -0.00753225f);
+	shCoefficientsLocalForInstance[5] = CREATECOMPLEXFLOAT(-0.00845301f, -0.0011418f);
+	shCoefficientsLocalForInstance[6] = CREATECOMPLEXFLOAT(0.000499378f, 0.0f);
+	shCoefficientsLocalForInstance[7] = CREATECOMPLEXFLOAT(0.00845301f, -0.0011418f);
+	shCoefficientsLocalForInstance[8] = CREATECOMPLEXFLOAT(-0.00204878f, 0.00753225f);
+
+	shCoefficientsLocalForInstance[9] = CREATECOMPLEXFLOAT(-0.0404278f, -0.138612f);
+	shCoefficientsLocalForInstance[10] = CREATECOMPLEXFLOAT(-0.000621932f, 0.00302165f);
+	shCoefficientsLocalForInstance[11] = CREATECOMPLEXFLOAT(0.155329f, -0.112407f);
+	shCoefficientsLocalForInstance[12] = CREATECOMPLEXFLOAT(0.00654569f, 0.0f);
+	shCoefficientsLocalForInstance[13] = CREATECOMPLEXFLOAT(-0.155329f, -0.112407f);
+	shCoefficientsLocalForInstance[14] = CREATECOMPLEXFLOAT(-0.000621932f, -0.00302165f);
+	shCoefficientsLocalForInstance[15] = CREATECOMPLEXFLOAT(0.0404278f, -0.138612f);
+	
+	shCoefficientsLocalForInstance[16] = CREATECOMPLEXFLOAT(-0.00906f, -0.00632612f);
+	shCoefficientsLocalForInstance[17] = CREATECOMPLEXFLOAT(-0.00849677f, 0.00302466f);
+	shCoefficientsLocalForInstance[18] = CREATECOMPLEXFLOAT(0.00259406f, -0.00662418f);
+	shCoefficientsLocalForInstance[19] = CREATECOMPLEXFLOAT(0.00394364f, 0.00011553f);
+	shCoefficientsLocalForInstance[20] = CREATECOMPLEXFLOAT(-0.0489091f, 0.0f);
+	shCoefficientsLocalForInstance[21] = CREATECOMPLEXFLOAT(-0.00394364f, 0.00011553f);
+	shCoefficientsLocalForInstance[22] = CREATECOMPLEXFLOAT(0.00259406f, 0.00662418f);
+	shCoefficientsLocalForInstance[23] = CREATECOMPLEXFLOAT(0.00849677f, 0.00302466f);
+	shCoefficientsLocalForInstance[24] = CREATECOMPLEXFLOAT(-0.00906f, 0.00632612f);
+}
+
+
+
+/////////////////////////////////////////////////
+
+DEVICEFN float calculateSphereharmonicsForRelativePosition(Vector3 position, ComplexFloat *shCoefficientsLocalForInstance, float debugRotation);
+
+// CUDA/openCL switch
+#if OPENCL
+
+#define KERNEL __kernel
+#define MEMORYGLOBAL __global
+#define MEMORYLOCAL __local
+
+
+#else
+
+#define KERNEL __global__
+#define MEMORYGLOBAL
+#define MEMORYLOCAL
+
+
+
+#endif
+
+KERNEL void singleSHkernel(MEMORYGLOBAL float* outputDepths, float debugRotation)
+{
+	MEMORYLOCAL ComplexFloat shCoefficientsLocalForInstance[1+3+5+7+9];
+
+	initializeShCoefficients((ComplexFloat*)&shCoefficientsLocalForInstance);
+
+#if OPENCL
+	size_t globalIdX = get_global_id(0);
+	size_t globalIdY = get_global_id(1);
+#else
+	size_t globalIdX = blockIdx.x*blockDim.x + threadIdx.x;
+	size_t globalIdY = blockIdx.y*blockDim.y + threadIdx.y;
+#endif
+
+	Vector3 horizontal = CREATEVECTOR3(0.0f, 0.0f, -1.0f);
+	Vector3 vertical   = CREATEVECTOR3(0.0f, 1.0f, 0.0f);
+	Vector3 orgin;
+	Vector3 cameraPos = CREATEVECTOR3(-10.0f, 10.0f, 0.0f);
+	
+	orgin = CREATEVECTOR3(((float)globalIdX*(1.0f/512.0f)-0.5f)*2.0f, ((float)globalIdY*(1.0f/512.0f)-0.5f)*2.0f, -1.5f);
+
+	Vector3 dir = (orgin - cameraPos) + horizontal*((float)globalIdX*(1.0f/512.0f)) + vertical*((float)globalIdY*(1.0f/512.0f));
+	dir = normalize(dir);
+
+	dir = CREATEVECTOR3(0.0f, 0.0f, 1.0f);
+
+	Vector3 position;
+	uint i;
+	float t;
+	int depthWritten;
+
+	depthWritten = 0;
+
+	position = orgin;
+
+	t = 0.0f; // hack, depends on the position
+
+
+	for( i = 0; i < /*40*/150; i++ )
+	{
+		Vector3 relativePositionToSh;
+		float distanceOfSphereHarmonics;
+		float valueOfSphereHarmonics;
+		float nearestDist;
+
+		relativePositionToSh = position - CREATEVECTOR3(0.0f, 0.0f, 0.0f);
+		distanceOfSphereHarmonics = dist(relativePositionToSh, CREATEVECTOR3(0.0f, 0.0f, 0.0f));
+		valueOfSphereHarmonics = calculateSphereharmonicsForRelativePosition(relativePositionToSh, (ComplexFloat*)&shCoefficientsLocalForInstance, debugRotation);
+
+		nearestDist = distanceOfSphereHarmonics - valueOfSphereHarmonics;
+		
+		if( nearestDist < EPSILON )
+		{
+			// it did hit Something
+
+			// write back the depth
+			outputDepths[globalIdX + 512*globalIdY] = t;
+
+			depthWritten = 1;
+
+			break;
+		}
+		
+		nearestDist = 0.02f; // step size is for testing fixed
+		
+		position = position + dir * nearestDist;
+		t += nearestDist;
+	}
+
+	// just overwrite the depth buffer
+	if( !depthWritten )
+	{
+		// TODO< infinity >
+		outputDepths[globalIdX + 512*globalIdY] = 0.0f;
+	}
+}
+
+/////////////////////
+
+// opencl only because we want to benchmark only with cuda
+#if OPENCL
+KERNEL void drawDepthskernel(MEMORYGLOBAL float* inputDepths, __write_only image2d_t outputImage)
+{
+	size_t globalIdX = get_global_id(0);
+	size_t globalIdY = get_global_id(1);
+
+	write_imagef(outputImage, (int2)(globalIdX, globalIdY), (float4)(0.0f, 0.0f, inputDepths[globalIdX+globalIdY*512]*0.2f, 1.0f));
+}
+#endif
+
+// openGL coordinate system
+
+//
+// y
+// /\       z
+// |      .
+// |    .
+// |  .
+// |.
+// -----------> x
+
+
+DEVICEFN float calculateSphereharmonicsForRelativePosition(Vector3 position, ComplexFloat *shCoefficientsLocalForInstance, float debugRotation)
+{
+	float phi;
+	float theta;
+
+	float sphereHarmonicsResult;
+
+	float xzPlaneDistance;
+
+	position = normalize(position);
+
+	// we do this because for calculating of theta we need the -cylindric- distance as x for atan/atan2
+	//xzPlaneDistance = sqrt(position.x*position.x + position.z*position.z);
+
+
+
+	// is for sure not correct
+	//phi = atan2(position.x, position.z) + debugRotation*2.0f*3.14159f;
+	//theta = atan(position.y/xzPlaneDistance)+3.14159f*0.5f;
+
+	sphereHarmonicsResult = calculateShDegree3Accelerated(position.y, position.x, position.z, 0, shCoefficientsLocalForInstance);
+	//sphereHarmonicsResult = calculateShDegree3ApproximationDegree4(theta, phi, 0, shCoefficientsLocalForInstance);
+
+	return sphereHarmonicsResult;
+}
+

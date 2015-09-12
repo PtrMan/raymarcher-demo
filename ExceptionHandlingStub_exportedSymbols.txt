@@ -1,0 +1,2 @@
+.text$_D21ExceptionHandlingStub22setupExceptionHandlingFZv
+.text$_D21ExceptionHandlingStub20lastExceptionHandlerFZv

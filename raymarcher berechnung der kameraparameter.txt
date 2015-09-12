@@ -1,0 +1,22 @@
+Needs["VectorAnalysis`"];
+
+LookAtPos = {0.0, 0.0, 0.0};
+
+CameraPos = {-10.0, 10.0, 0.0};
+
+DirectionVector = LookAtPos - CameraPos;
+DirectionVector = Normalize[DirectionVector];
+
+UpVector = {0.0, 1.0, 0.0};
+
+HorizontalVector = CrossProduct[UpVector, DirectionVector];
+VerticalVector = CrossProduct[DirectionVector, HorizontalVector];
+
+HorizontalVector = Normalize[HorizontalVector] (* needed *)
+VerticalVector = Normalize[VerticalVector] (* needed *)
+
+Orgin = CameraPos + DirectionVector - 0.5*HorizontalVector - 0.5*VerticalVector
+
+(* Debugging part *)
+
+(*Dir = (Orgin - CameraPos) + 0.5*HorizontalVector + 0.5*VerticalVector*)

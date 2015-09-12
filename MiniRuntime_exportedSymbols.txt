@@ -1,0 +1,2 @@
+.text$__d_framehandler
+.text$__d_local_unwind2

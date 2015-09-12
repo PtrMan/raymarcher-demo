@@ -1,0 +1,29 @@
+
+Needs["VectorAnalysis`"]
+
+a = {1.0, 0.0, 0.0};
+b = {0.0, 1.0, 0.0};
+
+center = {0.0, 0.0, 4.0};
+
+dist = 0.5;
+
+a = Normalize[a];
+b = Normalize[b];
+c = CrossProduct[a, b];
+
+s1 = center + dist*a;
+s2 = center - dist*a;
+
+s3 = center + dist*b;
+s4 = center - dist*b;
+
+s5 = center + dist*c;
+s6 = center - dist*c;
+
+s1
+s2
+s3
+s4
+s5
+s6

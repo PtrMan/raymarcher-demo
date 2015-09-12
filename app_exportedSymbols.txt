@@ -1,0 +1,3 @@
+.text$_D3app5entryFZv
+.text$_D3app10windowTickFPvPvZv
+.text$_D3app18windowInitCallbackFPvPvZv

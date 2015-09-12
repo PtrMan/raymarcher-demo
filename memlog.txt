@@ -1,0 +1,6 @@
+start
+allocate dart
+allocate 0
+allocate 1
+free dart
+eof
